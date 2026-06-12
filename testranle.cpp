@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "ranle.h"
+#include "../ranle.h"
 
 /* Example program for generating random LEs of Boolean lattices B_n  for n<=16  
 * The test part exemplifies the usage of individual components, and the illustration part gives an example of practical generation
@@ -26,12 +26,14 @@ int  main(int argc, char* argv[])
 	int mode = 0, Total = 1;
 	int markov = 100;
 	n = 5; Total = 10;
-
+	int rep = 2; // mixture
 
 	string out, stats, stats1;
 
-	// testranle.exe  n  total markov  mode  outputfile statsfile statfile1
-	// mode in {0,5}, 0 means KK walk, then methods 1,2,3,4,5 as per the manuscript
+	// testranle.exe  n  total markov  mode repeats  outputfile statsfile statfile1
+	// mode in {0,9}, 0 means KK walk, then methods 1,2,3,4,5,6-9 as per ranle.h
+	// repeats=0 uses default values for mode in {6,9}, otherwise it is the size of the mixture of additive/2-additive/WOWA
+
 
 	for (int i1 = 1; i1 < argc; i1++) {
 
@@ -43,6 +45,9 @@ int  main(int argc, char* argv[])
 		i1++;
 		mode = atoi(argv[i1]);
 		i1++;
+		rep = atoi(argv[i1]);
+		i1++;
+
 		out = (argv[i1]);
 		i1++;
 		stats = (argv[i1]);
@@ -75,6 +80,8 @@ int  main(int argc, char* argv[])
 	// method 3,5
 	ranle::LECardStart LEC(n);
 
+	// methods 6-9
+	ranle::AdditiveFM LEA(n);
 
 	fstream fstats;
 	fstats.open(stats.c_str(), ios::out);
@@ -117,7 +124,20 @@ int  main(int argc, char* argv[])
 				LE.meas = LEC.meas;
 			}
 			break;
+
+		case 6:
+		case 7:
+		case 8:
+		case 9:
+
+			int rr = mode - 6; // will be 0 =add 1 =2add 2 =wowa
+			
+			LEA.GenerateRandomLE(markov, rr, rep);
+			LE.meas = LEA.LE;
+			
+			break;
 		}
+		
 
 		// update statistics for the method chosen
 		switch (mode) {
@@ -163,14 +183,24 @@ fout.open(out.c_str(), ios::out);
 if (!fout.is_open()) return 0;
 
 	vector<ranle::int_64> Linext(m);
+
+	// optional: if FM are needed : 
+//	vector<double> FM(m);
+
 	ranle::LEGEN LEG(n);  // just keeps all the classes with internal structures
 	ranle::ResetTime();
 
 	for (int num = 0; num < Total; num++)
 	{
-		LEG.generate(Linext.data(), mode, 1, markov);
+		LEG.generate(Linext.data(), mode, 1, markov, rep);
+		// optional: 
+		//LEG.generateFM(FM.data(), mode, 1, markov, rep);
 
 		for (ranle::int_64 i = 0; i < m; i++) fout << (Linext[i]) << " ";
+
+		// optional: 
+		//for (ranle::int_64 i = 0; i < m; i++) fout << (FM[i]) << " ";
+
 		fout << endl;
 
 		// optional
@@ -180,6 +210,11 @@ if (!fout.is_open()) return 0;
 	// another way: careful with large m and Total, procedural interface
 	vector<ranle::int_64> LinextLarge(m*Total);
 	ranle::GenerateLE(LinextLarge.data(), n, mode, Total, markov);
+
+	// optional:
+	//vector<double> FMLarge(m* Total);
+	//ranle::GenerateFM(FMLarge.data(), n, mode, Total, markov);
+
 	double time = ranle::ElapsedTime();
 #endif
 
@@ -188,7 +223,6 @@ if (!fout.is_open()) return 0;
 	return 0;
 
 }
-
 
 
 
