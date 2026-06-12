@@ -14,9 +14,12 @@
 #include <cmath>
 
 /* =======================================================================
-* This package is to generate randomly linear extensions of Boolean lattices B_n (typically up to n=17) by one of the 4 methods and also with
+* This package is to generate randomly linear extensions of Boolean lattices B_n (typically up to n=17) by one of the 5 methods and also with
 * baseline KK-walk.
 * 
+* 
+* Can also generate the values of fuzzy measures instead of LE
+*
 * The package is C++ header-only. It uses namespace ranle.
 * 
 * To use it: 
@@ -29,7 +32,7 @@
 * vector<ranle::int_64> Linext( 1ULL<<n );// for one LE
 * 	for (int num = 0; num < Total; num++)
 	{
-		LEG.generate(Linext.data(), mode, 1, markov, rep);
+		LEG.generate(Linext.data(), mode, 1, markov, rep);// can be generateFM
 		// print Linext
 	}
 *  or:
@@ -37,7 +40,7 @@
 * LEG.generate(LinextLarge.data(), mode, Total, markov);
 * 
 * Alternatively one can use procedural interface
-* 	ranle::GenerateLE(LinextLarge.data(), n, mode, Total, markov);
+* 	ranle::GenerateLE(LinextLarge.data(), n, mode, Total, markov);// can be GenerateFM
 * 
 * 
 * The inputs are n, mode in {0,1,2,3,4,5,6,7,8,9}, and the number of additional markov steps to improve uniformity. rep is relevant to mode=6-9
