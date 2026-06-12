@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "../ranle.h"
+#include "ranle.h"
 
 /* Example program for generating random LEs of Boolean lattices B_n  for n<=16  
 * The test part exemplifies the usage of individual components, and the illustration part gives an example of practical generation
